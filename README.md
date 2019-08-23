@@ -137,7 +137,7 @@ conditionPlot (2, '1-27', 75, 8, 'myConditionPlot')
 
 The above command visualizes the Axx data (`cond` = 2) for conditions 1 to 27 (`conditions_to_visualize`) from channel 75 (`channel_to_visualize`), where the frequency is equal to 8 (`target_freq`). Then select the directory where the Power Diva files are located. 
 
-The plot will be saved in a file called 'myConditionPlot'
+The plot will be saved in a file called 'ConditionPlot'
 
 ![alt text](https://i.ibb.co/sRDzCrv/Justin-Gardner-Condition-Plot.png)
 
@@ -181,7 +181,7 @@ Running This Function
 
 The above command visualizes the Axx data (`cond` = 2) for conditions 1 to 27 (`conditions_to_visualize`) from channel 75 (`channel_to_visualize`), where the frequency is equal to 10 (`target_freq`). The contrasting levels are grouped into low contrast = '1-7', medium contrast = '10-16' and high contrast = 19-25. The signal to noise ratio is then displayed on the graph.
 
-The plot will be saved in a file called 'myOrientationPlot'
+The plot will be saved in a file called 'OrientationPlot'
 
 ![alt text](https://i.ibb.co/Jr6xHLF/Orientation-Plot.png)
 
@@ -221,6 +221,6 @@ Running this function
 The above command filters (SNR ratio > 4), averages and then visualizes the electrode data for Raw EEG data (`cond` = 3) for conditions 1 to 27 (`conditions_to_visualize`) where the frequency is equal to 10 (`target_freq`)
  with the low contrast set from '1-7', medium contrast '12-15', and high contrast '19-25'.
 
-The plot will be saved in a file called 'mySNRPlot'
+The plot will be saved in a file called 'significantSNRPlot'
 
 ![alt text](https://i.ibb.co/rv876QP/significant-SNRplot.png)
