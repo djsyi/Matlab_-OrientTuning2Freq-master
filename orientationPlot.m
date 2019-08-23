@@ -2,7 +2,8 @@ function z = orientationPlot(cond, conditions_to_visualize, channel_to_visualize
 
 % ex) orientationPlot (1, '1-27', 75, {'1-7', '12-15', '19-26'}, 10)
 % this function plots the orientation versus frequency amplitudes of EEG data 
-% split into different specified contrasting level obtained from PowerDiva up to 50 Hz of frequency.
+% split into different specified contrasting level obtained from PowerDiva (low, medium, high, average)
+% up to 50 Hz of frequency. The signal to noise ratio is then displayed on the graph
 
 % ***********
 % Variables
@@ -176,28 +177,13 @@ if cond == 3
         % Get all the amplitudes corresponding to target_freq within the jj-th condition
         % and sampling frequency of 420
         amplitude = get_frequency(a(:, conditions_to_visualize(jj)), 420, target_freq);
+        average_amplitude = get_avg_frequency(a(:, conditions_to_visualize(jj)), 420, target_freq);
         % condition_amplitude stores the amplitudes to be graphed (from 1 to number of conditions)
         condition_amplitude(jj) = amplitude;
+        average_condition_amplitude(jj) = average_amplitude
         jj = jj+1;
     end
 
-    % condition_amplitude is the corresponding amplitude of each contrast variable
-    % We reflect the corresponding amplitudes to account for the negative degrees (-90 to 0)
-    
-    maxy = max(condition_amplitude) % read in max amplitude to set y-axis range
-
-    fig = figure()
-    plot(orientation, reflect(condition_amplitude(low_contrast)))
-    hold on
-    plot(orientation, reflect(condition_amplitude(medium_contrast)))
-    plot(orientation, reflect(condition_amplitude(high_contrast)))
-    ylim([0 maxy]) % y-axis range
-    title('EEG Power vs Orientation')
-    xlabel('Orientation (Degrees)')
-    ylabel('F1+F2 EEG power (µV)')
-    legend({'High Contrast','Medium Contrast','Low Contrast'},'Location','northeast')
-    print(fig,file_name,'-dpng', '-r300')
-    
 %*************************************************************
 %*************************************************************
 
@@ -218,21 +204,11 @@ elseif cond == 2
         amplitude = axx_get_frequency(a(:,conditions_to_visualize(jj)), target_freq);
         condition_amplitude(jj) = amplitude;
         conditions(jj) = jj;
+        average_amplitude = axx_get_avg_frequency(a(:, conditions_to_visualize(jj)), target_freq);
+        average_condition_amplitude(jj) = average_amplitude
         jj = jj + 1;
     end
 
-    maxy = max(condition_amplitude)
-    fig = figure()
-    plot(orientation, reflect(condition_amplitude(low_contrast)))
-    hold on
-    plot(orientation, reflect(condition_amplitude(medium_contrast)))
-    plot(orientation, reflect(condition_amplitude(high_contrast)))
-    ylim([0 maxy]) % y-axis range
-    title('EEG Power vs Orientation')
-    xlabel('Orientation (Degrees)')
-    ylabel('F1+F2 EEG power (µV)')
-    legend({'High Contrast','Medium Contrast','Low Contrast'},'Location','northeast')
-    print(fig,file_name,'-dpng', '-r300')
 %*************************************************************
 %*************************************************************
 
@@ -255,30 +231,66 @@ elseif cond == 1
     for c = conditions_to_visualize % looping over conditions
         
         amplitude = axx_get_frequency(a(:,conditions_to_visualize(jj)), target_freq);
-
         condition_amplitude(jj) = amplitude;
+        average_amplitude = axx_get_avg_frequency(a(:, conditions_to_visualize(jj)), target_freq);
+        average_condition_amplitude(jj) = average_amplitude
         conditions(jj) = jj;
         jj = jj +1;
     end
 
-    maxy = max(condition_amplitude)
-    fig = figure()
-    plot(orientation, reflect(condition_amplitude(low_contrast)))
-    hold on
-    plot(orientation, reflect(condition_amplitude(medium_contrast)))
-    plot(orientation, reflect(condition_amplitude(high_contrast)))
-    ylim([0 maxy])
-    title('EEG Power vs Orientation')
-    xlabel('Orientation (Degrees)')
-    ylabel('F1+F2 EEG power (µV)')
-    legend({'High Contrast','Medium Contrast','Low Contrast'},'Location','northeast')
-    print(fig,file_name,'-dpng', '-r300')
+
 end
+% read in min/max amplitude to set y-axis range
+maxy = max(max(condition_amplitude, average_condition_amplitude))
+miny = min(min(condition_amplitude, average_condition_amplitude))
+
+% Compute the average of low, medium and high for the average_condition_amplitudes
+average_condition_amplitude = split(average_condition_amplitude, low_contrast, medium_contrast, high_contrast)
+
+% Compute max value among three contrasts and compare it to average
+    % condition_amplitude is the corresponding amplitude of each contrast variable
+    % We reflect the corresponding amplitudes to account for the negative degrees (-90 to 0)
+low_contrasts = reflect(condition_amplitude(low_contrast))
+medium_contrasts = reflect(condition_amplitude(medium_contrast))
+high_contrasts = reflect(condition_amplitude(high_contrast))
+average_contrasts = reflect(average_condition_amplitude)
+
+snr_ratio = find_SNR(orientation, low_contrasts, medium_contrasts, high_contrasts, average_contrasts)
+fig = figure()
+plot(orientation, low_contrasts)
+hold on
+plot(orientation, medium_contrasts)
+plot(orientation, high_contrasts)
+plot(orientation, average_contrasts)
+ylim([miny maxy])
+title('EEG Power vs Orientation')
+xlabel('Orientation (Degrees)')
+ylabel('F1+F2 EEG power (µV)')
+legend({'High Contrast','Medium Contrast','Low Contrast', 'Average'},'Location','northeast')
+text_box_dim = [.2 .5 .3 .3];
+str = sprintf('Ratio of max heights is %d', snr_ratio);
+annotation('textbox',text_box_dim,'String',str,'FitBoxToText','on');
+print(fig,file_name,'-dpng', '-r300')
 end
 
 % This function 'reflects' an array. 
 % Used to prepare the amplitudes to be graphed with negative orientations.
 % ex: reflect([1, 2, 3]) => [3, 2, 1, 2, 3]
 function y = reflect(a)
-	y = [fliplr(a(2:end)), a];
+    y = [fliplr(a(2:end)), a];
+end
+
+% Splits an array of frequencies into three contrasts and averages them
+% a is the array, length if the length of each contrast
+% ex: 
+% low_contrast = [1,2]
+% medium_contrast = [3,4]
+% high_contrast = [5,6]
+% split([1, 2, 5, 6, 3, 10], low_contrast, medium_contrast, high_contrast) => [3, 6]
+% function assumes that there are three groupings
+function x = split(a, low_contrast, medium_contrast, high_contrast)
+    low = a(low_contrast)
+    med = a(medium_contrast)
+    high = a(high_contrast)
+    x = (low + med + high) / 3
 end
