@@ -179,50 +179,6 @@ Running This Function
 
 `orientationPlot (2, '1-27', 75, {'1-7', '10-16', '19-25'}, 8, 'myOrientationPlot')`
 
-The above command visualizes the Axx data (`cond` = 2) for conditions 1 to 27 (`conditions_to_visualize`) from channel 75 (`channel_to_visualize`), where the frequency is equal to 10 (`target_freq`). The contrasting levels are grouped into low contrast = '1-7', medium contrast = '10-16' and high contrast = 19-25.
-
-The plot will be saved in a file called 'myOrientationPlot'
-
-![alt text](https://i.ibb.co/HnxkCzZ/Justin-Gardner-Orientation-Plot.png)
-
----
-
-### orientationPlot
-
-This function plots the orientation versus frequency amplitudes of EEG data split into different contrasting level obtained from PowerDiva. The signal to noise ratio is then displayed on the graph
-
-***********
-Input Variables
-***********
-
-`orientationPlot(cond, conditions_to_visualize, channel_to_visualize, groups_to_visualize, target_freq, file_name)`
-
-`cond` relates to the sort of data you would like to analyze. Your options are: 
- 1) Axx_trial 
- 2) Axx 
- 3) Raw EEG
-
-`conditions_to_visualize` is the conditions within the directory you would
-like to visualize. This is variable, depending on your data. 
-
-`channel_to_visualize` refers to the channel (out of the 128) that you
-would like to analyze. If you don't pass any argument for this, the
-program goes for the default channel, which is 75. 
-
-`groups_to_visualize` are the conditions that you want to group together for contrasting levels
-ex: ['1-7', '12-15', '19-26'] corresponds to low, medium and high contrasting
-
-`target_freq` represents the frequency that you want to graph the amplitudes for
-
-`file_name` represents the name of the file to save the plot to. If not provided, the default 
-file name of OrientationPlot will be used
-
-***********************
-Running This Function
-**********************
-
-`orientationPlot (2, '1-27', 75, {'1-7', '10-16', '19-25'}, 8, 'myOrientationPlot')`
-
 The above command visualizes the Axx data (`cond` = 2) for conditions 1 to 27 (`conditions_to_visualize`) from channel 75 (`channel_to_visualize`), where the frequency is equal to 10 (`target_freq`). The contrasting levels are grouped into low contrast = '1-7', medium contrast = '10-16' and high contrast = 19-25. The signal to noise ratio is then displayed on the graph.
 
 The plot will be saved in a file called 'myOrientationPlot'
@@ -268,8 +224,3 @@ The above command filters (SNR ratio > 4), averages and then visualizes the elec
 The plot will be saved in a file called 'mySNRPlot'
 
 ![alt text](https://i.ibb.co/rv876QP/significant-SNRplot.png)
-
-
-https://image.ibb.co
-
-https://image.ibb.co
